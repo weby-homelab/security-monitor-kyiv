@@ -113,10 +113,10 @@ def get_air_quality():
             elif aqi <= 150: status_text = "Шкідливе для чутливих"
             else: status_text = "Шкідливе"
             
-            return {"aqi": aqi, "text": status_text, "location": "Борщагівка (Булгакова)", "status": "ok"}
+            return {"aqi": aqi, "text": status_text, "location": "Борщагівка (Симиренка)", "status": "ok"}
     except Exception as e:
         print(f"AQI Error: {e}")
-    return {"aqi": "--", "text": "Невідомо", "location": "Булгакова", "status": "error"}
+    return {"aqi": "--", "text": "Невідомо", "location": "Симиренка", "status": "error"}
 
 @app.route('/')
 def index():
