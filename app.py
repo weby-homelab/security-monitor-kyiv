@@ -101,11 +101,13 @@ def get_air_quality():
     try:
         # OpenMeteo Air Quality API for Bulhakova St (Borshchahivka)
         # Lat: 50.408, Lon: 30.400
-        url = "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=50.408&longitude=30.400&current=us_aqi"
+        url = "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=50.408&longitude=30.400&current=us_aqi,pm2_5"
         r = requests.get(url, timeout=5)
         if r.status_code == 200:
             data = r.json()
-            aqi = data.get('current', {}).get('us_aqi', 0)
+            current = data.get('current', {})
+            aqi = current.get('us_aqi', 0)
+            pm25 = current.get('pm2_5', 0)
             
             # Determine text status
             if aqi <= 50: status_text = "Відмінне"
@@ -113,10 +115,16 @@ def get_air_quality():
             elif aqi <= 150: status_text = "Шкідливе для чутливих"
             else: status_text = "Шкідливе"
             
-            return {"aqi": aqi, "text": status_text, "location": "Борщагівка (Симиренка)", "status": "ok"}
+            return {
+                "aqi": aqi, 
+                "pm25": pm25,
+                "text": status_text, 
+                "location": "Борщагівка (Симиренка)", 
+                "status": "ok"
+            }
     except Exception as e:
         print(f"AQI Error: {e}")
-    return {"aqi": "--", "text": "Невідомо", "location": "Симиренка", "status": "error"}
+    return {"aqi": "--", "pm25": "--", "text": "Невідомо", "location": "Симиренка", "status": "error"}
 
 @app.route('/')
 def index():

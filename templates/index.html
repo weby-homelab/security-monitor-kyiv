@@ -74,6 +74,9 @@
             <div class="title" id="aqi-title">Якість повітря</div>
             <div class="value" id="aqi-val" style="color: #4caf50;">--</div>
             <div class="status-text" id="aqi-status">Завантаження...</div>
+            <div style="color: #888; font-size: 14px; margin-top: 5px;">
+                PM2.5: <span id="aqi-pm25">--</span> мкг/м³
+            </div>
         </div>
 
         <!-- Radiation (Static Normal) -->
@@ -129,11 +132,13 @@
                     const aqiVal = document.getElementById('aqi-val');
                     const aqiStatus = document.getElementById('aqi-status');
                     const aqiTitle = document.getElementById('aqi-title');
+                    const aqiPm25 = document.getElementById('aqi-pm25');
                     
                     if (data.aqi && data.aqi.status === 'ok') {
                         aqiVal.innerText = data.aqi.aqi;
                         aqiStatus.innerText = data.aqi.text;
                         aqiTitle.innerText = "Якість повітря: " + data.aqi.location;
+                        aqiPm25.innerText = data.aqi.pm25;
                         
                         const val = data.aqi.aqi;
                         if (val <= 50) aqiVal.style.color = '#4caf50'; // Green
