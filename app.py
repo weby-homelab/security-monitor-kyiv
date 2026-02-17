@@ -78,7 +78,7 @@ def get_last_power_event():
                     text = "Світло з'явилося" if evt == "up" else "Світло зникло"
                     pre_text = "не було" if evt == "up" else "було"
                     
-                    return f"{dt_str} {icon} {text} ({pre_text} {dur_str})"
+                    return f"{dt_str} {icon} {text}<br><span style='font-size: 0.9em; color: #aaa;'>({pre_text} {dur_str})</span>"
     except:
         pass
     return "Немає даних про події"
