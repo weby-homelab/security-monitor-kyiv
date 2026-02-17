@@ -50,18 +50,52 @@ def get_radiation():
         "status": "normal"
     }
 
+LIGHT_STATE_FILE = "/root/geminicli/light-monitor-kyiv/power_monitor_state.json"
+EVENT_LOG_FILE = "/root/geminicli/light-monitor-kyiv/event_log.json"
+
+def format_duration(seconds):
+    h = int(seconds // 3600)
+    m = int((seconds % 3600) // 60)
+    return f"{h} год {m} хв"
+
+def get_last_power_event():
+    try:
+        if os.path.exists(EVENT_LOG_FILE):
+            with open(EVENT_LOG_FILE, "r") as f:
+                logs = json.load(f)
+                if len(logs) >= 2:
+                    last = logs[-1]
+                    prev = logs[-2]
+                    
+                    ts = last['timestamp']
+                    dt_str = datetime.fromtimestamp(ts).strftime("%d.%m %H:%M")
+                    evt = last['event']
+                    
+                    dur_sec = ts - prev['timestamp']
+                    dur_str = format_duration(dur_sec)
+                    
+                    icon = "🟢" if evt == "up" else "🔴"
+                    text = "Світло з'явилося" if evt == "up" else "Світло зникло"
+                    pre_text = "не було" if evt == "up" else "було"
+                    
+                    return f"{dt_str} {icon} {text} ({pre_text} {dur_str})"
+    except:
+        pass
+    return "Немає даних про події"
+
 def get_light_status():
     try:
-        r = requests.get(LIGHT_MONITOR_URL, timeout=2)
-        if r.status_code == 200:
-            text = r.text
-            if "СВІТЛО Є" in text:
-                return "on"
-            elif "СВІТЛА НЕМАЄ" in text:
-                return "off"
-    except Exception as e:
-        print(f"Light Monitor Error: {e}")
-    return "unknown"
+        if os.path.exists(LIGHT_STATE_FILE):
+            with open(LIGHT_STATE_FILE, "r") as f:
+                state = json.load(f)
+                status = state.get("status", "unknown")
+                event_text = get_last_power_event()
+                
+                res = "on" if status == "up" else "off" if status == "down" else "unknown"
+                return {"status": res, "event": event_text}
+    except:
+        pass
+    return {"status": "unknown", "event": "--"}
 
 def get_air_quality():
     try:
@@ -91,13 +125,14 @@ def index():
 def api_status():
     alert = get_air_raid_alert()
     radiation = get_radiation()
-    light = get_light_status()
+    light_info = get_light_status()
     aqi = get_air_quality()
     
     return jsonify({
         "alert": alert,
         "radiation": radiation,
-        "light": light,
+        "light": light_info["status"],
+        "light_event": light_info["event"],
         "aqi": aqi,
         "timestamp": datetime.now().strftime("%H:%M:%S")
     })

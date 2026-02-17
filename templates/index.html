@@ -136,10 +136,10 @@
                     
                     if (data.light === 'on') {
                         lightVal.innerHTML = '<span class="light-on">💡 Є СВІТЛО</span>';
-                        lightStatus.innerText = 'Система працює стабільно';
+                        lightStatus.innerText = data.light_event;
                     } else if (data.light === 'off') {
                         lightVal.innerHTML = '<span class="light-off">🕯 НЕМАЄ СВІТЛА</span>';
-                        lightStatus.innerText = 'Працює від батареї';
+                        lightStatus.innerText = data.light_event;
                     } else {
                         lightVal.innerText = 'Невідомо';
                         lightStatus.innerText = 'Немає зв\'язку з монітором';
