@@ -99,8 +99,9 @@ def get_light_status():
 
 def get_air_quality():
     try:
-        # OpenMeteo Air Quality API (Kyiv coordinates)
-        url = "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=50.45&longitude=30.52&current=us_aqi"
+        # OpenMeteo Air Quality API for Bulhakova St (Borshchahivka)
+        # Lat: 50.408, Lon: 30.400
+        url = "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=50.408&longitude=30.400&current=us_aqi"
         r = requests.get(url, timeout=5)
         if r.status_code == 200:
             data = r.json()
@@ -112,10 +113,10 @@ def get_air_quality():
             elif aqi <= 150: status_text = "Шкідливе для чутливих"
             else: status_text = "Шкідливе"
             
-            return {"aqi": aqi, "text": status_text, "status": "ok"}
+            return {"aqi": aqi, "text": status_text, "location": "Борщагівка (Булгакова)", "status": "ok"}
     except Exception as e:
         print(f"AQI Error: {e}")
-    return {"aqi": "--", "text": "Невідомо", "status": "error"}
+    return {"aqi": "--", "text": "Невідомо", "location": "Булгакова", "status": "error"}
 
 @app.route('/')
 def index():

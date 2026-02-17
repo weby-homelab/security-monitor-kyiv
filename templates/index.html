@@ -71,7 +71,7 @@
 
         <!-- Air Quality (Custom) -->
         <div class="card">
-            <div class="title">Якість повітря (Київ)</div>
+            <div class="title" id="aqi-title">Якість повітря</div>
             <div class="value" id="aqi-val" style="color: #4caf50;">--</div>
             <div class="status-text" id="aqi-status">Завантаження...</div>
         </div>
@@ -128,10 +128,12 @@
                     // AQI
                     const aqiVal = document.getElementById('aqi-val');
                     const aqiStatus = document.getElementById('aqi-status');
+                    const aqiTitle = document.getElementById('aqi-title');
                     
                     if (data.aqi && data.aqi.status === 'ok') {
                         aqiVal.innerText = data.aqi.aqi;
                         aqiStatus.innerText = data.aqi.text;
+                        aqiTitle.innerText = "Якість повітря: " + data.aqi.location;
                         
                         const val = data.aqi.aqi;
                         if (val <= 50) aqiVal.style.color = '#4caf50'; // Green
