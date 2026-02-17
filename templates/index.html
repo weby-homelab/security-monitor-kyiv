@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Центр Безпеки (Київ)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; text-align: center; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        
+        .card { 
+            background: #1e1e1e; 
+            border-radius: 12px; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        
+        .title { color: #aaa; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .value { font-size: 32px; font-weight: bold; }
+        .status-text { font-size: 18px; margin-top: 5px; }
+
+        /* Alerts */
+        .alert-card.active { background: #d32f2f; animation: pulse 2s infinite; }
+        .alert-card.clear { background: #388e3c; }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(211, 47, 47, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); }
+        }
+
+        /* Radiation */
+        .rad-value { color: #4fc3f7; }
+        .rad-unit { font-size: 16px; color: #888; }
+
+        /* Light */
+        .light-on { color: #ffd700; }
+        .light-off { color: #757575; }
+
+        .footer { font-size: 12px; color: #666; margin-top: 40px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡 Центр Безпеки</h1>
+        
+        <!-- Air Raid Alert -->
+        <div id="alert-card" class="card alert-card clear">
+            <div class="title">Повітряна тривога (Київ)</div>
+            <div class="value" id="alert-status">Завантаження...</div>
+            <div class="status-text" id="alert-location">--</div>
+        </div>
+
+        <!-- Alerts Map Iframe -->
+        <div class="card" style="padding: 0; overflow: hidden; height: 400px;">
+            <iframe src="https://alerts.in.ua/?minimal=true" width="100%" height="100%" frameborder="0" style="border:0;"></iframe>
+        </div>
+
+        <!-- Air Quality (Custom) -->
+        <div class="card">
+            <div class="title">Якість повітря (Київ)</div>
+            <div class="value" id="aqi-val" style="color: #4caf50;">--</div>
+            <div class="status-text" id="aqi-status">Завантаження...</div>
+        </div>
+
+        <!-- Radiation (Static Normal) -->
+        <div class="card">
+            <div class="title">Радіаційний фон</div>
+            <div class="value rad-value">
+                <span id="rad-val">0.11</span> <span class="rad-unit">мкЗв/год</span>
+            </div>
+            <div class="status-text" style="color: #4caf50;">В нормі (Стабільно)</div>
+        </div>
+
+        <!-- Light Status -->
+        <div class="card">
+            <div class="title">Електропостачання</div>
+            <div class="value" id="light-val">--</div>
+            <div class="status-text" id="light-status">Отримання даних...</div>
+        </div>
+
+        <div class="footer">
+            Оновлено: <span id="last-updated">--:--:--</span> | Розроблено для srvrs.pp.ua
+        </div>
+    </div>
+
+    <script>
+        function updateStatus() {
+            fetch('/api/status')
+                .then(response => {
+                    if (!response.ok) { throw new Error("HTTP error " + response.status); }
+                    return response.json();
+                })
+                .then(data => {
+                    // Alert
+                    const alertCard = document.getElementById('alert-card');
+                    const alertText = document.getElementById('alert-status');
+                    const alertLoc = document.getElementById('alert-location');
+                    
+                    if (data.alert.city) {
+                        alertCard.className = 'card alert-card active';
+                        alertText.innerText = 'ТРИВОГА (КИЇВ)!';
+                        alertLoc.innerText = 'Пройдіть в укриття!';
+                    } else if (data.alert.region) {
+                        alertCard.className = 'card alert-card active';
+                        alertText.innerText = 'ТРИВОГА (ОБЛАСТЬ)';
+                        alertLoc.innerText = 'Київська область';
+                    } else {
+                        alertCard.className = 'card alert-card clear';
+                        alertText.innerText = 'СПОКІЙНО';
+                        alertLoc.innerText = 'Тривоги немає';
+                    }
+
+                    // AQI
+                    const aqiVal = document.getElementById('aqi-val');
+                    const aqiStatus = document.getElementById('aqi-status');
+                    
+                    if (data.aqi && data.aqi.status === 'ok') {
+                        aqiVal.innerText = data.aqi.aqi;
+                        aqiStatus.innerText = data.aqi.text;
+                        
+                        const val = data.aqi.aqi;
+                        if (val <= 50) aqiVal.style.color = '#4caf50'; // Green
+                        else if (val <= 100) aqiVal.style.color = '#ffeb3b'; // Yellow
+                        else if (val <= 150) aqiVal.style.color = '#ff9800'; // Orange
+                        else aqiVal.style.color = '#f44336'; // Red
+                    } else {
+                        aqiVal.innerText = '--';
+                        aqiStatus.innerText = 'Немає даних';
+                    }
+
+                    // Light
+                    const lightVal = document.getElementById('light-val');
+                    const lightStatus = document.getElementById('light-status');
+                    
+                    if (data.light === 'on') {
+                        lightVal.innerHTML = '<span class="light-on">💡 Є СВІТЛО</span>';
+                        lightStatus.innerText = 'Система працює стабільно';
+                    } else if (data.light === 'off') {
+                        lightVal.innerHTML = '<span class="light-off">🕯 НЕМАЄ СВІТЛА</span>';
+                        lightStatus.innerText = 'Працює від батареї';
+                    } else {
+                        lightVal.innerText = 'Невідомо';
+                        lightStatus.innerText = 'Немає зв\'язку з монітором';
+                    }
+
+                    document.getElementById('last-updated').innerText = data.timestamp;
+                })
+                .catch(err => {
+                    console.error("Update failed: ", err);
+                    document.getElementById('light-status').innerText = "Помилка оновлення (" + err.message + ")";
+                });
+        }
+
+        // Update every 10 seconds
+        setInterval(updateStatus, 10000);
+        // Start immediately
+        setTimeout(updateStatus, 100); 
+    </script>
+</body>
+</html>

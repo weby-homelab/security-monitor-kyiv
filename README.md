@@ -1,0 +1,121 @@
+# 🛡 Security Monitor Kyiv
+
+[![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-3.0%2B-000000?style=flat-square&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![License](https://img.shields.io/github/license/weby-homelab/security-monitor-kyiv?style=flat-square)](LICENSE)
+[![Status](https://img.shields.io/badge/Status-Active-success?style=flat-square)]()
+
+> **Сучасний центр моніторингу безпеки для вашого дому (Kyiv Edition).**
+
+**Security Monitor Kyiv** — це веб-дашборд, що агрегує критично важливу інформацію про безпеку в реальному часі. Розроблений для запуску на домашніх серверах (Raspberry Pi, VPS, Proxmox), він надає миттєвий огляд ситуації за вікном.
+
+---
+
+## ✨ Основні можливості
+
+*   🚨 **Повітряна тривога:**
+    *   Миттєвий статус для Києва та області.
+    *   Інтегрована жива карта тривог (`alerts.in.ua`).
+    *   Візуальна індикація небезпеки (червоний пульсуючий екран).
+
+*   ☁️ **Якість повітря (AQI):**
+    *   Реальні дані через API OpenMeteo.
+    *   Індекс якості повітря (US AQI) з кольоровим кодуванням (Відмінне, Помірне, Шкідливе).
+
+*   💡 **Енергопостачання:**
+    *   Інтеграція з локальним сервісом [light-monitor-kyiv](https://github.com/weby-homelab/light-monitor-kyiv).
+    *   Відображення статусу світла ("Є Світло" / "Немає Світла") в реальному часі.
+
+*   ☢️ **Радіаційний фон:**
+    *   Моніторинг рівня гамма-випромінювання (мкЗв/год).
+
+*   🎨 **Сучасний UI:**
+    *   Dark Mode (Темна тема) за замовчуванням.
+    *   Адаптивний дизайн для мобільних пристроїв, планшетів та настінних дисплеїв.
+    *   Автоматичне оновлення даних без перезавантаження сторінки (AJAX).
+
+---
+
+## 📸 Скріншоти
+
+![Dashboard Screenshot](https://raw.githubusercontent.com/weby-homelab/security-monitor-kyiv/main/docs/dashboard_preview.jpg)
+*(Приклад інтерфейсу)*
+
+---
+
+## 🛠 Технологічний стек
+
+*   **Backend:** Python 3 + Flask (Gunicorn для продакшену).
+*   **Frontend:** HTML5, CSS3 (Custom Dark Theme), Vanilla JS.
+*   **API Integrations:**
+    *   `ubilling.net.ua` (Alerts)
+    *   `open-meteo.com` (Air Quality)
+    *   Local API (Light Monitor)
+
+---
+
+## 🚀 Встановлення та запуск
+
+### 1. Вимоги
+*   Linux сервер (Ubuntu/Debian)
+*   Python 3.10+
+*   Встановлений `light-monitor-kyiv` (опціонально, для статусу світла)
+
+### 2. Встановлення
+
+```bash
+# Клонування репозиторію
+git clone https://github.com/weby-homelab/security-monitor-kyiv.git
+cd security-monitor-kyiv
+
+# Створення віртуального оточення
+python3 -m venv venv
+source venv/bin/activate
+
+# Встановлення залежностей
+pip install -r requirements.txt
+```
+
+### 3. Налаштування Systemd (Автозапуск)
+
+Створіть файл сервісу `/etc/systemd/system/security-monitor.service`:
+
+```ini
+[Unit]
+Description=Security Monitor Kyiv (Flask App)
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/path/to/security-monitor-kyiv
+ExecStart=/path/to/security-monitor-kyiv/venv/bin/gunicorn -b 0.0.0.0:5000 app:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Запустіть сервіс:
+```bash
+systemctl daemon-reload
+systemctl enable security-monitor
+systemctl start security-monitor
+```
+
+### 4. Доступ
+Відкрийте браузер: `http://YOUR_SERVER_IP:5000`
+
+---
+
+## 🤝 Контриб'ютинг
+
+Ми вітаємо будь-які ідеї! Якщо ви хочете додати підтримку нових датчиків або API:
+1.  Форкніть проект.
+2.  Створіть гілку (`git checkout -b feature/NewSensor`).
+3.  Зробіть Pull Request.
+
+---
+
+## 📜 Ліцензія
+
+MIT License. Розроблено для спільноти `srvrs.pp.ua`.
