@@ -121,6 +121,10 @@ def get_air_quality():
 def index():
     return render_template('index.html')
 
+@app.route('/robots.txt')
+def robots_txt():
+    return "User-agent: *\nAllow: /", 200, {'Content-Type': 'text/plain'}
+
 @app.route('/api/status')
 def api_status():
     alert = get_air_raid_alert()

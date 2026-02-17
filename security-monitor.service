@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=root
 WorkingDirectory=/root/geminicli/security-monitor-kyiv
-ExecStart=/root/geminicli/security-monitor-kyiv/venv/bin/gunicorn -b 0.0.0.0:5000 app:app
+ExecStart=/root/geminicli/security-monitor-kyiv/venv/bin/gunicorn --workers 4 --threads 2 -b 0.0.0.0:5000 app:app
 Restart=always
 
 [Install]

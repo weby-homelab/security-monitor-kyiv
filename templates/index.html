@@ -2,8 +2,18 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Центр Безпеки (Київ)</title>
+    <title>Центр Безпеки (Київ) — Моніторинг у реальному часі</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Моніторинг повітряних тривог, радіаційного фону, якості повітря та наявності світла у Києві (Святошинський район). Дані в реальному часі.">
+    <meta name="keywords" content="Київ, повітряна тривога, радіація, світло, відключення, моніторинг, AQI, безпека">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Центр Безпеки (Київ)">
+    <meta property="og:description" content="Статус тривог, радіації та світла у Києві.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/weby-homelab/security-monitor-kyiv/main/docs/dashboard_preview.jpg">
+
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; text-align: center; margin: 0; padding: 20px; }
         .container { max-width: 600px; margin: 0 auto; }
@@ -39,6 +49,8 @@
         .light-off { color: #757575; }
 
         .footer { font-size: 12px; color: #666; margin-top: 40px; }
+        .footer a { color: #888; text-decoration: none; }
+        .footer a:hover { color: #fff; text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -81,7 +93,8 @@
         </div>
 
         <div class="footer">
-            Оновлено: <span id="last-updated">--:--:--</span> | Розроблено для srvrs.pp.ua
+            Оновлено: <span id="last-updated">--:--:--</span><br>
+            <a href="https://github.com/weby-homelab/security-monitor-kyiv" target="_blank">GitHub: weby-homelab/security-monitor-kyiv</a>
         </div>
     </div>
 
