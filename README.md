@@ -76,9 +76,9 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 3. Налаштування Systemd (Автозапуск)
+### 3. Налаштування Systemd (High Load & Auto-start)
 
-Створіть файл сервісу `/etc/systemd/system/security-monitor.service`:
+Для стабільної роботи під навантаженням ми використовуємо Gunicorn з декількома воркерами. Створіть файл `/etc/systemd/system/security-monitor.service`:
 
 ```ini
 [Unit]
@@ -88,7 +88,8 @@ After=network.target
 [Service]
 User=root
 WorkingDirectory=/path/to/security-monitor-kyiv
-ExecStart=/path/to/security-monitor-kyiv/venv/bin/gunicorn -b 0.0.0.0:5000 app:app
+# Оптимізація: 4 воркери + 2 потоки для обробки запитів без черг
+ExecStart=/path/to/security-monitor-kyiv/venv/bin/gunicorn --workers 4 --threads 2 -b 0.0.0.0:5000 app:app
 Restart=always
 
 [Install]
@@ -102,8 +103,15 @@ systemctl enable security-monitor
 systemctl start security-monitor
 ```
 
-### 4. Доступ
-Відкрийте браузер: `http://YOUR_SERVER_IP:5000`
+### 4. Доступ та Безпека
+⚠️ **Важливо:** Не залишайте порт 5000 відкритим у світ (`0.0.0.0`) без захисту.
+
+Рекомендовані способи доступу:
+1.  **Cloudflare Tunnel:** Безпечний доступ без відкриття портів (рекомендовано).
+2.  **Nginx Reverse Proxy:** Налаштуйте Nginx з SSL перед Gunicorn.
+3.  **VPN/Tailscale:** Доступ тільки з внутрішньої мережі.
+
+Приклад доступу: `https://your-secure-domain.com` або `http://localhost:5000` (локально).
 
 ---
 
