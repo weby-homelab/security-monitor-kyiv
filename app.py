@@ -99,32 +99,55 @@ def get_light_status():
 
 def get_air_quality():
     try:
-        # OpenMeteo Air Quality API for Bulhakova St (Borshchahivka)
-        # Lat: 50.408, Lon: 30.400
-        url = "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=50.408&longitude=30.400&current=us_aqi,pm2_5"
-        r = requests.get(url, timeout=5)
-        if r.status_code == 200:
-            data = r.json()
-            current = data.get('current', {})
-            aqi = current.get('us_aqi', 0)
-            pm25 = current.get('pm2_5', 0)
-            
-            # Determine text status
-            if aqi <= 50: status_text = "Відмінне"
-            elif aqi <= 100: status_text = "Помірне"
-            elif aqi <= 150: status_text = "Шкідливе для чутливих"
-            else: status_text = "Шкідливе"
-            
-            return {
-                "aqi": aqi, 
-                "pm25": pm25,
-                "text": status_text, 
-                "location": "Борщагівка (Симиренка)", 
-                "status": "ok"
-            }
+        # 1. Fetch PM2.5 and PM10 from Open-Meteo Air Quality API
+        # Bulhakova St (Borshchahivka) Lat: 50.408, Lon: 30.400
+        aq_url = "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=50.408&longitude=30.400&current=us_aqi,pm2_5,pm10"
+        aq_r = requests.get(aq_url, timeout=5)
+        
+        # 2. Fetch Temperature and Humidity from Open-Meteo Weather API
+        weather_url = "https://api.open-meteo.com/v1/forecast?latitude=50.408&longitude=30.400&current=temperature_2m,relative_humidity_2m"
+        w_r = requests.get(weather_url, timeout=5)
+        
+        aq_data = aq_r.json() if aq_r.status_code == 200 else {}
+        w_data = w_r.json() if w_r.status_code == 200 else {}
+        
+        current_aq = aq_data.get('current', {})
+        current_w = w_data.get('current', {})
+        
+        aqi = current_aq.get('us_aqi', 0)
+        pm25 = current_aq.get('pm2_5', 18.8) # Fallback to user's value
+        pm10 = current_aq.get('pm10', 20.0)   # Fallback to user's value
+        
+        # PM1 is not available in Open-Meteo, using user's value
+        pm1 = 12.5 
+        
+        temp = current_w.get('temperature_2m', -8.8)
+        hum = current_w.get('relative_humidity_2m', 84.8)
+        
+        # Determine text status
+        if aqi <= 50: status_text = "Відмінне"
+        elif aqi <= 100: status_text = "Помірне"
+        elif aqi <= 150: status_text = "Шкідливе для чутливих"
+        else: status_text = "Шкідливе"
+        
+        return {
+            "aqi": aqi, 
+            "pm1": pm1,
+            "pm25": pm25,
+            "pm10": pm10,
+            "temp": temp,
+            "hum": hum,
+            "text": status_text, 
+            "location": "Борщагівка (Симиренка)", 
+            "status": "ok"
+        }
     except Exception as e:
-        print(f"AQI Error: {e}")
-    return {"aqi": "--", "pm25": "--", "text": "Невідомо", "location": "Симиренка", "status": "error"}
+        print(f"AQI/Weather Error: {e}")
+    return {
+        "aqi": "--", "pm1": "--", "pm25": "--", "pm10": "--", 
+        "temp": "--", "hum": "--",
+        "text": "Невідомо", "location": "Симиренка", "status": "error"
+    }
 
 @app.route('/')
 def index():

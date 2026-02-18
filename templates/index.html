@@ -74,8 +74,12 @@
             <div class="title" id="aqi-title">Якість повітря</div>
             <div class="value" id="aqi-val" style="color: #4caf50;">--</div>
             <div class="status-text" id="aqi-status">Завантаження...</div>
-            <div style="color: #888; font-size: 14px; margin-top: 5px;">
-                PM2.5: <span id="aqi-pm25">--</span> мкг/м³
+            <div style="color: #aaa; font-size: 14px; margin-top: 15px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+                <div style="background: #2a2a2a; padding: 5px 10px; border-radius: 6px;">☁️ PM1: <span id="aqi-pm1" style="color: #fff;">--</span></div>
+                <div style="background: #2a2a2a; padding: 5px 10px; border-radius: 6px;">☁️ PM2.5: <span id="aqi-pm25" style="color: #fff;">--</span></div>
+                <div style="background: #2a2a2a; padding: 5px 10px; border-radius: 6px;">☁️ PM10: <span id="aqi-pm10" style="color: #fff;">--</span></div>
+                <div style="background: #2a2a2a; padding: 5px 10px; border-radius: 6px;">🌡️ <span id="aqi-temp" style="color: #fff;">--</span> °C</div>
+                <div style="background: #2a2a2a; padding: 5px 10px; border-radius: 6px;">💧 <span id="aqi-hum" style="color: #fff;">--</span> %</div>
             </div>
         </div>
 
@@ -132,13 +136,21 @@
                     const aqiVal = document.getElementById('aqi-val');
                     const aqiStatus = document.getElementById('aqi-status');
                     const aqiTitle = document.getElementById('aqi-title');
+                    const aqiPm1 = document.getElementById('aqi-pm1');
                     const aqiPm25 = document.getElementById('aqi-pm25');
+                    const aqiPm10 = document.getElementById('aqi-pm10');
+                    const aqiTemp = document.getElementById('aqi-temp');
+                    const aqiHum = document.getElementById('aqi-hum');
                     
                     if (data.aqi && data.aqi.status === 'ok') {
                         aqiVal.innerText = data.aqi.aqi;
                         aqiStatus.innerText = data.aqi.text;
                         aqiTitle.innerText = "Якість повітря: " + data.aqi.location;
+                        aqiPm1.innerText = data.aqi.pm1;
                         aqiPm25.innerText = data.aqi.pm25;
+                        aqiPm10.innerText = data.aqi.pm10;
+                        aqiTemp.innerText = data.aqi.temp;
+                        aqiHum.innerText = data.aqi.hum;
                         
                         const val = data.aqi.aqi;
                         if (val <= 50) aqiVal.style.color = '#4caf50'; // Green
