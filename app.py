@@ -99,13 +99,31 @@ def get_light_status():
 
 def get_air_quality():
     try:
-        # 1. Fetch PM2.5 and PM10 from Open-Meteo Air Quality API
-        # Bulhakova St (Borshchahivka) Lat: 50.408, Lon: 30.400
+        # 1. Try to scrape PM data from SaveEcoBot (Station 17095 - Bulhakova St)
+        pm1, pm25, pm10 = None, None, None
+        try:
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+            seb_r = requests.get("https://www.saveecobot.com/station/17095", headers=headers, timeout=10)
+            if seb_r.status_code == 200:
+                soup = BeautifulSoup(seb_r.text, 'html.parser')
+                text = soup.get_text()
+                
+                import re
+                pm1_match = re.search(r"PM1:\s*([\d.]+)", text)
+                pm25_match = re.search(r"PM2.5:\s*([\d.]+)", text)
+                pm10_match = re.search(r"PM10:\s*([\d.]+)", text)
+                
+                if pm1_match: pm1 = float(pm1_match.group(1))
+                if pm25_match: pm25 = float(pm25_match.group(1))
+                if pm10_match: pm10 = float(pm10_match.group(1))
+        except Exception as e:
+            print(f"SaveEcoBot scraping error: {e}")
+
+        # 2. Fetch AQI, Temp, Humidity from Open-Meteo
         aq_url = "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=50.408&longitude=30.400&current=us_aqi,pm2_5,pm10"
-        aq_r = requests.get(aq_url, timeout=5)
-        
-        # 2. Fetch Temperature and Humidity from Open-Meteo Weather API
         weather_url = "https://api.open-meteo.com/v1/forecast?latitude=50.408&longitude=30.400&current=temperature_2m,relative_humidity_2m"
+        
+        aq_r = requests.get(aq_url, timeout=5)
         w_r = requests.get(weather_url, timeout=5)
         
         aq_data = aq_r.json() if aq_r.status_code == 200 else {}
@@ -115,14 +133,14 @@ def get_air_quality():
         current_w = w_data.get('current', {})
         
         aqi = current_aq.get('us_aqi', 0)
-        pm25 = current_aq.get('pm2_5', 18.8) # Fallback to user's value
-        pm10 = current_aq.get('pm10', 20.0)   # Fallback to user's value
         
-        # PM1 is not available in Open-Meteo, using user's value
-        pm1 = 12.5 
+        # Use SaveEcoBot data if available, otherwise fallback to Open-Meteo
+        final_pm1 = pm1 if pm1 is not None else None # We will hide it in UI if None
+        final_pm25 = pm25 if pm25 is not None else current_aq.get('pm2_5', "--")
+        final_pm10 = pm10 if pm10 is not None else current_aq.get('pm10', "--")
         
-        temp = current_w.get('temperature_2m', -8.8)
-        hum = current_w.get('relative_humidity_2m', 84.8)
+        temp = current_w.get('temperature_2m', "--")
+        hum = current_w.get('relative_humidity_2m', "--")
         
         # Determine text status
         if aqi <= 50: status_text = "Відмінне"
@@ -132,19 +150,19 @@ def get_air_quality():
         
         return {
             "aqi": aqi, 
-            "pm1": pm1,
-            "pm25": pm25,
-            "pm10": pm10,
+            "pm1": final_pm1,
+            "pm25": final_pm25,
+            "pm10": final_pm10,
             "temp": temp,
             "hum": hum,
             "text": status_text, 
-            "location": "Борщагівка (Симиренка)", 
+            "location": "Борщагівка (Булгакова)", 
             "status": "ok"
         }
     except Exception as e:
         print(f"AQI/Weather Error: {e}")
     return {
-        "aqi": "--", "pm1": "--", "pm25": "--", "pm10": "--", 
+        "aqi": "--", "pm1": None, "pm25": "--", "pm10": "--", 
         "temp": "--", "hum": "--",
         "text": "Невідомо", "location": "Симиренка", "status": "error"
     }

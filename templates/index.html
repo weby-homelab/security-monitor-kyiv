@@ -136,6 +136,7 @@
                     const aqiVal = document.getElementById('aqi-val');
                     const aqiStatus = document.getElementById('aqi-status');
                     const aqiTitle = document.getElementById('aqi-title');
+                    const aqiPm1Container = document.getElementById('aqi-pm1').parentNode;
                     const aqiPm1 = document.getElementById('aqi-pm1');
                     const aqiPm25 = document.getElementById('aqi-pm25');
                     const aqiPm10 = document.getElementById('aqi-pm10');
@@ -146,7 +147,14 @@
                         aqiVal.innerText = data.aqi.aqi;
                         aqiStatus.innerText = data.aqi.text;
                         aqiTitle.innerText = "Якість повітря: " + data.aqi.location;
-                        aqiPm1.innerText = data.aqi.pm1;
+                        
+                        if (data.aqi.pm1 !== null) {
+                            aqiPm1.innerText = data.aqi.pm1;
+                            aqiPm1Container.style.display = 'block';
+                        } else {
+                            aqiPm1Container.style.display = 'none';
+                        }
+                        
                         aqiPm25.innerText = data.aqi.pm25;
                         aqiPm10.innerText = data.aqi.pm10;
                         aqiTemp.innerText = data.aqi.temp;
