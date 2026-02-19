@@ -60,7 +60,7 @@
 
 ## 📸 Скріншоти
 
-![Dashboard Screenshot](https://raw.githubusercontent.com/weby-homelab/security-monitor-kyiv/main/docs/dashboard_preview.jpg)
+![Dashboard Screenshot](dashboard_preview.jpg)
 *(Приклад інтерфейсу)*
 
 ---
