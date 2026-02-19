@@ -1,5 +1,5 @@
 import requests
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, send_from_directory
 import json
 from datetime import datetime
 import os
@@ -10,6 +10,19 @@ app = Flask(__name__)
 # --- Configuration ---
 ALERTS_API_URL = "https://ubilling.net.ua/aerialalerts/"
 LIGHT_MONITOR_URL = "http://127.0.0.1:8889/"
+
+# --- PWA Routes ---
+@app.route('/manifest.json')
+def manifest():
+    return send_from_directory('static', 'manifest.json')
+
+@app.route('/service-worker.js')
+def service_worker():
+    return send_from_directory('static', 'service-worker.js')
+
+@app.route('/static/<path:filename>')
+def serve_static(filename):
+    return send_from_directory('static', filename)
 
 def get_air_raid_alert():
     try:
@@ -156,7 +169,7 @@ def get_air_quality():
             "temp": temp,
             "hum": hum,
             "text": status_text, 
-            "location": "Борщагівка (Булгакова)", 
+            "location": "Борщагівка (Симиренка)", 
             "status": "ok"
         }
     except Exception as e:

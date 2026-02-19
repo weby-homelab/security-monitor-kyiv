@@ -14,6 +14,13 @@
     <meta property="og:description" content="Статус тривог, радіації та світла у Києві.">
     <meta property="og:image" content="https://raw.githubusercontent.com/weby-homelab/security-monitor-kyiv/main/docs/dashboard_preview.jpg">
 
+    <!-- PWA Settings -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#1E122A">
+    <link rel="icon" type="image/svg+xml" href="/static/icon.svg">
+    <link rel="apple-touch-icon" href="/static/icon.svg">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; text-align: center; margin: 0; padding: 20px; }
         .container { max-width: 600px; margin: 0 auto; }
@@ -197,6 +204,15 @@
         setInterval(updateStatus, 10000);
         // Start immediately
         setTimeout(updateStatus, 100); 
+
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(reg => console.log('SW registered!', reg))
+                    .catch(err => console.log('SW failed!', err));
+            });
+        }
     </script>
 </body>
 </html>
