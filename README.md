@@ -2,8 +2,8 @@
 
 [![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.0%2B-000000?style=flat-square&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
-[![License](https://img.shields.io/github/license/weby-homelab/security-monitor-kyiv?style=flat-square)](LICENSE)
-[![Status](https://img.shields.io/badge/Статус-Активно-success?style=flat-square)]()
+[![Ліцензія](https://img.shields.io/github/license/weby-homelab/security-monitor-kyiv?style=flat-square&label=%D0%9B%D1%96%D1%86%D0%B5%D0%BD%D0%B7%D1%96%D1%8F)](LICENSE)
+[![Статус](https://img.shields.io/badge/%D0%A1%D1%82%D0%B0%D1%82%D1%83%D1%81-%D0%90%D0%BA%D1%82%D0%B8%D0%B2%D0%BD%D0%BE-success?style=flat-square)]()
 
 > **Сучасний центр моніторингу безпеки для вашого дому (Київське видання).**
 
