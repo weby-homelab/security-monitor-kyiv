@@ -134,7 +134,7 @@ def get_air_quality():
 
         # 2. Fetch AQI, Temp, Humidity from Open-Meteo
         aq_url = "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=50.408&longitude=30.400&current=us_aqi,pm2_5,pm10"
-        weather_url = "https://api.open-meteo.com/v1/forecast?latitude=50.408&longitude=30.400&current=temperature_2m,relative_humidity_2m"
+        weather_url = "https://api.open-meteo.com/v1/forecast?latitude=50.408&longitude=30.400&current=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m"
         
         aq_r = requests.get(aq_url, timeout=5)
         w_r = requests.get(weather_url, timeout=5)
@@ -155,6 +155,14 @@ def get_air_quality():
         temp = current_w.get('temperature_2m', "--")
         hum = current_w.get('relative_humidity_2m', "--")
         
+        wind_speed = current_w.get('wind_speed_10m', "--")
+        wind_dir_deg = current_w.get('wind_direction_10m', None)
+        wind_dir = "--"
+        if wind_dir_deg is not None:
+            dirs = ['Пн', 'Пн-Сх', 'Сх', 'Пд-Сх', 'Пд', 'Пд-Зх', 'Зх', 'Пн-Зх']
+            ix = int((wind_dir_deg + 22.5) / 45) % 8
+            wind_dir = dirs[ix]
+        
         # Determine text status
         if aqi <= 50: status_text = "Відмінне"
         elif aqi <= 100: status_text = "Помірне"
@@ -168,6 +176,8 @@ def get_air_quality():
             "pm10": final_pm10,
             "temp": temp,
             "hum": hum,
+            "wind_speed": wind_speed,
+            "wind_dir": wind_dir,
             "text": status_text, 
             "location": "Борщагівка (Симиренка)", 
             "status": "ok"
@@ -176,7 +186,7 @@ def get_air_quality():
         print(f"AQI/Weather Error: {e}")
     return {
         "aqi": "--", "pm1": None, "pm25": "--", "pm10": "--", 
-        "temp": "--", "hum": "--",
+        "temp": "--", "hum": "--", "wind_speed": "--", "wind_dir": "--",
         "text": "Невідомо", "location": "Симиренка", "status": "error"
     }
 
