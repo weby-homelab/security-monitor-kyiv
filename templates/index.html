@@ -131,6 +131,14 @@
             audioEnabled = !audioEnabled;
             this.innerText = audioEnabled ? "🔔" : "🔕";
             this.style.opacity = audioEnabled ? "1" : "0.5";
+            
+            // Request Notification Permission
+            if (audioEnabled && "Notification" in window) {
+                if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+                    Notification.requestPermission();
+                }
+            }
+            
             if (audioEnabled) {
                 playBeep(); // test beep
             }
@@ -159,6 +167,14 @@
         function triggerAlarmBeeps() {
             playBeep();
             setTimeout(playBeep, 250);
+            
+            if (audioEnabled && "Notification" in window && Notification.permission === "granted") {
+                new Notification("ТРИВОГА (КИЇВ)!", {
+                    body: "Пройдіть в укриття!",
+                    icon: "/static/icon.svg",
+                    vibrate: [200, 100, 200]
+                });
+            }
         }
 
         function updateStatus() {
