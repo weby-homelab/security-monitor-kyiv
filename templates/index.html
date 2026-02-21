@@ -62,7 +62,10 @@
 </head>
 <body>
     <div class="container">
-        <h1>🛡 Центр Безпеки</h1>
+        <h1 style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+            🛡 Центр Безпеки
+            <span id="audio-toggle" style="cursor:pointer; font-size:24px; opacity:0.5;" title="Увімкнути звукові сповіщення">🔕</span>
+        </h1>
         
         <!-- Air Raid Alert -->
         <div id="alert-card" class="card alert-card clear">
@@ -114,6 +117,50 @@
     </div>
 
     <script>
+        let wasAlertActive = false;
+        let audioCtx = null;
+        let audioEnabled = false;
+
+        document.getElementById('audio-toggle').addEventListener('click', function() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            audioEnabled = !audioEnabled;
+            this.innerText = audioEnabled ? "🔔" : "🔕";
+            this.style.opacity = audioEnabled ? "1" : "0.5";
+            if (audioEnabled) {
+                playBeep(); // test beep
+            }
+        });
+
+        function playBeep() {
+            if (!audioCtx || !audioEnabled) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+            
+            gainNode.gain.setValueAtTime(0.02, audioCtx.currentTime); // quiet beep
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.15);
+        }
+
+        function triggerAlarmBeeps() {
+            playBeep();
+            setTimeout(playBeep, 250);
+        }
+
         function updateStatus() {
             fetch('/api/status')
                 .then(response => {
@@ -126,6 +173,13 @@
                     const alertText = document.getElementById('alert-status');
                     const alertLoc = document.getElementById('alert-location');
                     
+                    const isCityAlert = !!data.alert.city;
+                    
+                    if (isCityAlert && !wasAlertActive) {
+                        triggerAlarmBeeps();
+                    }
+                    wasAlertActive = isCityAlert;
+
                     if (data.alert.city) {
                         alertCard.className = 'card alert-card active';
                         alertText.innerText = 'ТРИВОГА (КИЇВ)!';
