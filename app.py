@@ -3,6 +3,7 @@ from flask import Flask, render_template, jsonify, send_from_directory
 import json
 from datetime import datetime
 import os
+import time
 from bs4 import BeautifulSoup
 
 app = Flask(__name__)
@@ -10,6 +11,19 @@ app = Flask(__name__)
 # --- Configuration ---
 ALERTS_API_URL = "https://ubilling.net.ua/aerialalerts/"
 LIGHT_MONITOR_URL = "http://127.0.0.1:8889/"
+
+# --- Caching ---
+CACHE = {}
+CACHE_TTL = 30
+
+def cached_fetch(key, func):
+    now = time.time()
+    if key in CACHE and now - CACHE[key]['time'] < CACHE_TTL:
+        return CACHE[key]['data']
+    
+    data = func()
+    CACHE[key] = {'time': now, 'data': data}
+    return data
 
 # --- PWA Routes ---
 @app.route('/manifest.json')
@@ -200,10 +214,10 @@ def robots_txt():
 
 @app.route('/api/status')
 def api_status():
-    alert = get_air_raid_alert()
-    radiation = get_radiation()
-    light_info = get_light_status()
-    aqi = get_air_quality()
+    alert = cached_fetch('alert', get_air_raid_alert)
+    radiation = cached_fetch('radiation', get_radiation)
+    light_info = cached_fetch('light', get_light_status)
+    aqi = cached_fetch('aqi', get_air_quality)
     
     return jsonify({
         "alert": alert,

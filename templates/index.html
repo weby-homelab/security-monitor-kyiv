@@ -119,9 +119,15 @@
     <script>
         let wasAlertActive = false;
         let audioCtx = null;
-        let audioEnabled = false;
+        let audioEnabled = localStorage.getItem('audioEnabled_security') === 'true';
 
-        document.getElementById('audio-toggle').addEventListener('click', function() {
+        const audioToggleBtn = document.getElementById('audio-toggle');
+        if (audioEnabled) {
+            audioToggleBtn.innerText = "🔔";
+            audioToggleBtn.style.opacity = "1";
+        }
+
+        audioToggleBtn.addEventListener('click', function() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             }
@@ -129,6 +135,7 @@
                 audioCtx.resume();
             }
             audioEnabled = !audioEnabled;
+            localStorage.setItem('audioEnabled_security', audioEnabled);
             this.innerText = audioEnabled ? "🔔" : "🔕";
             this.style.opacity = audioEnabled ? "1" : "0.5";
             
