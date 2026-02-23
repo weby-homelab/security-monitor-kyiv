@@ -148,5 +148,5 @@ systemctl start security-monitor
 
 ## 📜 Ліцензія
 
-© 2026 [Weby Homelab](https://github.com/weby-homelab/security-monitor-kyiv) — infrastructure that doesn’t give up  
-Made with ❤️ in Kyiv under air raid sirens
+© 2026 Weby Homelab — infrastructure that doesn’t give up.
+Made with ❤️ in Kyiv under air raid sirens and blackouts...
