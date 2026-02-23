@@ -148,4 +148,5 @@ systemctl start security-monitor
 
 ## 📜 Ліцензія
 
-Ліцензія MIT. Розроблено з ❤️ у Києві під час блекаутів.
+© 2026 [Weby Homelab](https://github.com/weby-homelab/security-monitor-kyiv) — infrastructure that doesn’t give up  
+Made with ❤️ in Kyiv under air raid sirens
